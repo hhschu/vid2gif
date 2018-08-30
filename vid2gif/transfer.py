@@ -12,6 +12,7 @@ TRANSFERD_DATA_DIR = DATA_DIR_BASE + 'transferd/'
 
 def upload(client, fnames):
     for im in fnames:
+        im = Path(im)
         client.file(ORIGINAL_DATA_DIR + str(im.name)).put(im.read_bytes())
 
 
@@ -24,13 +25,13 @@ def download(client, folder):
 
 def style_transfer(fnames, out_folder, filter_name):
     client = Algorithmia.client(API_KEY)
-    p = Path(in_folder)
-    assert p.exists()
+    client.dir(ORIGINAL_DATA_DIR).create()
+    client.dir(TRANSFERD_DATA_DIR).create()
 
-    ims = upload(client, p)
+    upload(client, fnames)
     inputs = {
-        "images": [ORIGINAL_DATA_DIR + im for im in ims],
-        "savePaths": [TRANSFERD_DATA_DIR + im for im in ims],
+        "images": [ORIGINAL_DATA_DIR + Path(im).name for im in fnames],
+        "savePaths": [TRANSFERD_DATA_DIR + Path(im).name  for im in fnames],
         "filterName": filter_name
     }
 
